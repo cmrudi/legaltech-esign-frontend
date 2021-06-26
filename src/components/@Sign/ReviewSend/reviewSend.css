@@ -30,7 +30,7 @@
 }
 .right.sign-review-send-container .table-row td {
   padding: 0.7rem 0.5rem;
-  background-color: #f4f8ff;
+  background-color: var(--light-blue-color);
 }
 .fallback-empty-row td {
   text-align: center;

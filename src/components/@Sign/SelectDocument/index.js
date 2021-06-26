@@ -118,61 +118,63 @@ const SelectDocument = ({
   };
 
   return (
-    <div className="container container-center sign-select-document-container">
+    <>
       {error && <Snackbar text={error} />}
       {success && <Snackbar type="primary" text={success} />}
-      <div>
-        <h4 className="">{t("sign.selectDocument.whatNeed")}</h4>
-        <div className="mt-5 lead mb-2">{t("sign.selectDocument.text")}</div>
-        <DragDrop
-          data={data}
-          progress={progress}
-          // disabled={progress.value === 100}
-        />
+      <div className="container container-center sign-select-document-container">
+        <div>
+          <h4 className="">{t("sign.selectDocument.whatNeed")}</h4>
+          <div className="mt-5 lead mb-2">{t("sign.selectDocument.text")}</div>
+          <DragDrop
+            data={data}
+            progress={progress}
+            // disabled={progress.value === 100}
+          />
 
-        <div className="mt-5 lead mb-2">
-          {t("sign.selectDocument.docsUSelected")}
+          <div className="mt-5 lead mb-2">
+            {t("sign.selectDocument.docsUSelected")}
+          </div>
+          {fileData && !data?.file && (
+            <>
+              <div className="item-left">
+                {console.log(fileData)}
+                <DocumentIcon />
+                <div className="px-2">{fileData?.filename}</div>
+                <div className="mx-2 cursor-pointer">
+                  <DeleteDocumentIcon onClick={handleDeleteFile} />
+                </div>
+              </div>
+              <div className="mt-3">
+                <Progressbar progress={100} />
+              </div>
+            </>
+          )}
+          {data?.file && (
+            <>
+              <div className="item-left">
+                <DocumentIcon />
+                <div className="px-2">{data?.file?.name}</div>
+                <div className="mx-2 cursor-pointer">
+                  <DeleteDocumentIcon onClick={handleDeleteFile} />
+                </div>
+              </div>
+              <div className="mt-3">
+                <Progressbar progress={progress.value} />
+              </div>
+            </>
+          )}
         </div>
-        {fileData && !data?.file && (
-          <>
-            <div className="item-left">
-              {console.log(fileData)}
-              <DocumentIcon />
-              <div className="px-2">{fileData?.filename}</div>
-              <div className="mx-2 cursor-pointer">
-                <DeleteDocumentIcon onClick={handleDeleteFile} />
-              </div>
-            </div>
-            <div className="mt-3">
-              <Progressbar progress={100} />
-            </div>
-          </>
-        )}
-        {data?.file && (
-          <>
-            <div className="item-left">
-              <DocumentIcon />
-              <div className="px-2">{data?.file?.name}</div>
-              <div className="mx-2 cursor-pointer">
-                <DeleteDocumentIcon onClick={handleDeleteFile} />
-              </div>
-            </div>
-            <div className="mt-3">
-              <Progressbar progress={progress.value} />
-            </div>
-          </>
-        )}
-      </div>
 
-      <FloatingButton
-        activeItem={activeItem}
-        // availableLevel={availableLevel}
-        onClickNext={() => {
-          setActiveItem((a) => a + 1);
-        }}
-        disabled={shallNext()}
-      />
-    </div>
+        <FloatingButton
+          activeItem={activeItem}
+          // availableLevel={availableLevel}
+          onClickNext={() => {
+            setActiveItem((a) => a + 1);
+          }}
+          disabled={shallNext()}
+        />
+      </div>
+    </>
   );
 };
 
