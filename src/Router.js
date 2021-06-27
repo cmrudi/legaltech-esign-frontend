@@ -11,6 +11,7 @@ import Settings from "./components/@Settings";
 import Docs from "./components/@Docs";
 import { FRONTEND_URL } from "./helpers/constant";
 import Request from "./components/@Sign/@Request";
+import Sign from "./components/@Sign/@Sign";
 
 const Router = () => {
   return (
@@ -24,6 +25,7 @@ const Router = () => {
       <Route render={() => <Me />} path={FRONTEND_URL.me} exact />
       <Route render={() => <All />} path={FRONTEND_URL.all} exact />
       <Route render={() => <Request />} path={FRONTEND_URL.request} exact />
+      <Route render={() => <Sign />} path={FRONTEND_URL.signing} exact />
       <Route
         render={() => (
           <LayoutWrapper>

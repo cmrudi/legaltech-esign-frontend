@@ -13,6 +13,7 @@ export const FRONTEND_URL = {
   base: "/sign",
   login: "/login",
   sign: "/sign",
+  signing: "/signing",
   me: `/${DOC.me}`,
   all: `/${DOC.all}`,
   request: `/${DOC.request}`,

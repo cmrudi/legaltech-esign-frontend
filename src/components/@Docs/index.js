@@ -9,6 +9,7 @@ import Table from "./Table";
 import AuditTrail from "./AuditTrail";
 import "./docs.css";
 import { useHistory } from "react-router-dom";
+import { FRONTEND_URL } from "../../helpers/constant";
 
 const Docs = () => {
   const { t } = useTranslation();
@@ -47,10 +48,15 @@ const Docs = () => {
 
   const handleClickingComponent = useCallback(
     (obj) => {
+      const key = String(obj?.signType).toLowerCase();
+      // dis only for testing
+
       if (obj?.nextflow && obj.nextflow?.length === 0) {
-        const key = String(obj?.signType).toLowerCase();
         handle_data_docs(true, key, "fileData", obj);
-        history.push(`${key}`);
+        history.push(`${FRONTEND_URL.signing}?for=${key}`);
+        //   history.push(`${key}`);
+      } else {
+        //   history.push(`${FRONTEND_URL.signing}?for=${key}`);
       }
     },
     [handle_data_docs, history]
