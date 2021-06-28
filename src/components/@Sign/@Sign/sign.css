@@ -1,7 +1,7 @@
 .webviewer {
   height: 100vh;
 }
-.place-field-area .left-sidebar .button-placefields {
+.sign-area .left-sidebar .button-placefields {
   background: var(--text-color);
   width: 100%;
   border: 0;
@@ -9,7 +9,7 @@
   font-weight: bolder;
   padding: 0.4rem 0;
 }
-.place-field-area .left-sidebar select {
+.sign-area .left-sidebar select {
   background: var(--text-color);
   width: 100%;
   border: 0;
@@ -18,14 +18,14 @@
   font-weight: bolder;
   padding: 0.4rem 0;
 }
-.place-field-area .left-sidebar {
+.sign-area .left-sidebar {
   background: var(--light-blue-color);
 }
-.place-field-area .lead {
+.sign-area .lead {
   padding: 1rem 0 0;
 }
 
-.place-field-area .left-sidebar select ::before {
+.sign-area .left-sidebar select ::before {
   content: " ";
   display: inline-block;
   width: 1rem;
@@ -33,5 +33,5 @@
   margin-right: 5px;
   background: attr(data-before);
 }
-/* .place-field-area .left-sidebar select option::before {
+/* .sign-area .left-sidebar select option::before {
 } */

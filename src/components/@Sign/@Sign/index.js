@@ -3,7 +3,8 @@ import React, { useRef, useEffect, useState } from "react";
 // import { navigate } from "@reach/router";
 // import { selectDocToView } from "./ViewDocumentSlice";
 // import { storage } from '../../firebase/firebase';
-import WebViewer, { Annotations } from "@pdftron/webviewer";
+import WebViewer from "@pdftron/webviewer";
+import CoreControls from "@pdftron/webviewer";
 import { useData } from "../../../contexts/DataContext";
 import { useAuth } from "../../../contexts/AuthContext";
 
@@ -14,352 +15,171 @@ const temp =
   "https://storage.googleapis.com/legaltech-esign-develop/develop/doc/aisc_jones_napoleon_pdf1624197842048";
 
 const Sign = () => {
-  const [instance, setInstance] = useState(null);
   const { auth } = useAuth();
 
-  // JOJO
-  const [dropPoint, setDropPoint] = useState(null);
+  const [annotManager, setAnnotatManager] = useState(null);
+  const [annotPosition, setAnnotPosition] = useState(0);
+  const [docViewer, setDocViewer] = useState(null);
 
-  const { handle_data_docs, getItemData } = useData();
+  const { getItemData } = useData();
 
   const location = useLocation();
 
   const atr = String(location?.search).slice(5, 7);
 
   const fileData = getItemData(atr, "fileData");
-  var assignees = getItemData(atr, "signers");
-
-  // !!TODO DELETE kalo udah nambahin di /me
-  assignees.push({
-    email: "jonathanyudigun@gmail.com",
-    name: "Jojo",
-    flowtype: "SIGN",
-  });
-  const assigneesValues = assignees.map((user) => ({
-    value: user.email,
-    label: user.name,
-  }));
-  let initialAssignee =
-    assigneesValues.length > 0 ? assigneesValues[0] : { value: "", label: "" };
-  const [assignee, setAssignee] = useState(initialAssignee);
-  // END JOJO
+  // TODO fetch myFields (GET /api/doc/:docid/fields)
 
   const viewer = useRef(null);
 
   useEffect(() => {
-    if (typeof fileData?.linkToPdf === "string" && auth?.id_token)
-      WebViewer(
-        {
-          path: "webviewer",
-          disabledElements: ["ribbons", "toggleNotesButton"],
-        },
-        viewer.current
-      ).then(async (instance) => {
-        instance.loadDocument(fileData?.linkToPdf ?? temp, {
-          filename: fileData?.filename ?? "jones.pdf",
-        });
-        instance.setToolbarGroup("toolbarGroup-View");
-        setInstance(instance);
+    WebViewer(
+      {
+        path: "webviewer",
+        disabledElements: [
+          "ribbons",
+          "toggleNotesButton",
+          "searchButton",
+          "menuButton",
+          "rubberStampToolGroupButton",
+          "stampToolGroupButton",
+          "fileAttachmentToolGroupButton",
+          "calloutToolGroupButton",
+          "undo",
+          "redo",
+          "eraserToolButton",
+        ],
+      },
+      viewer.current
+    ).then(async (instance) => {
+      const { docViewer, annotManager, Annotations } = instance;
+      setAnnotatManager(annotManager);
+      setDocViewer(docViewer);
 
-        // JOJO
-        const { iframeWindow } = instance;
-        const iframeDoc = iframeWindow.document.body;
-        iframeDoc.addEventListener("dragover", dragOver);
-        iframeDoc.addEventListener("drop", (e) => {
-          drop(e, instance);
-        });
-        // END JOJO
+      // select only the insert group
+      instance.setToolbarGroup("toolbarGroup-Insert");
+
+      // load document
+      docViewer.loadDocument(fileData?.linkToPdf ?? temp, {
+        filename: fileData?.filename,
       });
+
+      const signatureTool = docViewer.getTool('AnnotationCreateSignature');
+      docViewer.on('documentLoaded', () => {
+        console.log("signature tool", signatureTool)
+        // TODO import signature from /api/user/signatures
+        // const signatures = JSON.parse('[[[{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[21.59754154057473,151.01371910999913,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[21.59754154057473,151.01371910999913,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[24.451680867431776,146.73251011971357,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[54.420143799430704,122.47232584142873,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[94.37809437542924,103.92042021685793,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[124.34655730742817,101.06628089000091,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[142.89846293199892,103.92042021685793,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[152.8879505759986,109.62869887057202,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[180.00227418114045,125.32646516828575,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[192.84590115199717,135.3159528122854,1]}},{\"Pa\":{\"rows\":3,\"Ar\":1,\"Zq\":[204.2624584594253,149.58664944657062,1]}}]]]');
+        // const signatures = [[new CoreControls.Math.Point(200, 180), new CoreControls.Math.Point(200, 190)]];
+        // console.log(signatures);
+        // signatureTool.importSignatures(signatures);
+        // var signex = signatureTool.exportSignatures();
+        // console.log("signature tool", JSON.stringify(signex));
+      });
+
+      // const normalStyles = (widget) => {
+      //   if (widget instanceof Annotations.TextWidgetAnnotation) {
+      //     return {
+      //       "background-color": "#a5c7ff",
+      //       color: "white",
+      //     };
+      //   } else if (widget instanceof Annotations.SignatureWidgetAnnotation) {
+      //     return {
+      //       border: "1px solid #a5c7ff",
+      //     };
+      //   }
+      // };
+
+      // annotManager.on(
+      //   "annotationChanged",
+      //   (annotations, action, { imported }) => {
+      //     if (imported && action === "add") {
+      //       annotations.forEach(function (annot) {
+      //         if (annot instanceof Annotations.WidgetAnnotation) {
+      //           Annotations.WidgetAnnotation.getCustomStyles = normalStyles;
+      //           // TODO if annot.getCustomData(id) not in myFields
+      //           if (false) {
+      //             annot.Hidden = true;
+      //             annot.Listable = false;
+      //           }
+      //         }
+      //       });
+      //     }
+      //   }
+      // );
+    });
   }, [fileData, auth?.id_token]);
 
-  // const download = () => {
-  //   instance.downloadPdf(true);
-  // };
-
-  // const doneViewing = async () => {
-  //   console.log("d");
-  // };
-
-  // JOJO
-  const dragOver = (e) => {
-    e.preventDefault();
-    return false;
-  };
-
-  const drop = (e, instance) => {
-    const { docViewer = false } = instance;
-    const scrollElement = docViewer?.getScrollViewElement();
-    const scrollLeft = scrollElement.scrollLeft || 0;
-    const scrollTop = scrollElement.scrollTop || 0;
-    setDropPoint({ x: e.pageX + scrollLeft, y: e.pageY + scrollTop });
-    e.preventDefault();
-    return false;
-  };
-
-  const dragStart = (e) => {
-    e.target.style.opacity = 0.5;
-    const copy = e.target.cloneNode(true);
-    copy.id = "form-build-drag-image-copy";
-    copy.style.width = "250px";
-    document.body.appendChild(copy);
-    e.dataTransfer.setDragImage(copy, 125, 25);
-    e.dataTransfer.setData("text", "");
-  };
-
-  const dragEnd = (e, type) => {
-    addField(type, dropPoint);
-    e.target.style.opacity = 1;
-    document.body.removeChild(
-      document.getElementById("form-build-drag-image-copy")
-    );
-    e.preventDefault();
-  };
-
-  useEffect(() => {
-    console.log("assi", assignee);
-  }, [assignee]);
-
-  const addField = (type, autoFill = false, point = {}, value) => {
-    const { docViewer, Annotations } = instance;
-    const annotManager = docViewer.getAnnotationManager();
-    const doc = docViewer.getDocument();
-    const displayMode = docViewer.getDisplayModeManager().getDisplayMode();
-    const page = displayMode.getSelectedPages(point, point);
-    if (!!point?.x && page.first == null) return; //don't add field to an invalid page location
-
-    const page_idx =
-      page.first !== null ? page.first : docViewer.getCurrentPage();
-    const page_info = doc.getPageInfo(page_idx);
-    const page_point = displayMode.windowToPage(point, page_idx);
-    const zoom = docViewer.getZoom();
-
-    var textAnnot = new Annotations.FreeTextAnnotation();
-    textAnnot.PageNumber = page_idx;
-    const rotation = docViewer.getCompleteRotation(page_idx) * 90;
-    textAnnot.Rotation = rotation;
-    if (rotation === 270 || rotation === 90) {
-      textAnnot.Width = 50.0 / zoom;
-      textAnnot.Height = 250.0 / zoom;
-    } else {
-      textAnnot.Width = 250.0 / zoom;
-      textAnnot.Height = 50.0 / zoom;
+  const nextField = () => {
+    let annots = annotManager.getAnnotationsList();
+    if (annots[annotPosition]) {
+      annotManager.jumpToAnnotation(annots[annotPosition]);
+      if (annots[annotPosition + 1]) {
+        setAnnotPosition(annotPosition + 1);
+      }
     }
-    textAnnot.X = (page_point.x || page_info.width / 2) - textAnnot.Width / 2;
-    textAnnot.Y = (page_point.y || page_info.height / 2) - textAnnot.Height / 2;
-
-    textAnnot.setPadding(new Annotations.Rect(0, 0, 0, 0));
-    // TODO default field placeholder
-
-    var defaultValue = value ?? `${assignee.value} ${type}`;
-    textAnnot.custom = {
-      id: null,
-      type,
-      value: defaultValue,
-      autoFill,
-    };
-
-    // set the type of annot
-    textAnnot.setContents(textAnnot.custom.value);
-    textAnnot.FontSize = "" + 16.0 / zoom + "px";
-    textAnnot.FillColor = new Annotations.Color(211, 211, 211, 0.5);
-    textAnnot.TextColor = new Annotations.Color(0, 165, 228);
-    textAnnot.StrokeThickness = 1;
-    textAnnot.StrokeColor = new Annotations.Color(0, 165, 228);
-    textAnnot.TextAlign = "center";
-
-    textAnnot.Author = annotManager.getCurrentUser();
-
-    annotManager.deselectAllAnnotations();
-    annotManager.addAnnotation(textAnnot, true);
-    annotManager.redrawAnnotation(textAnnot);
-    annotManager.selectAnnotation(textAnnot);
   };
 
-  const applyFields = async () => {
-    // TODO pindahin ke ReviewSend.js
-    const { Annotations, docViewer } = instance;
-    const annotManager = docViewer.getAnnotationManager();
-    const fieldManager = annotManager.getFieldManager();
-    const annotationsList = annotManager.getAnnotationsList();
-    const annotsToDelete = [];
-    const annotsToDraw = [];
+  const prevField = () => {
+    let annots = annotManager.getAnnotationsList();
+    if (annots[annotPosition]) {
+      annotManager.jumpToAnnotation(annots[annotPosition]);
+      if (annots[annotPosition - 1]) {
+        setAnnotPosition(annotPosition - 1);
+      }
+    }
+  };
 
-    await Promise.all(
-      annotationsList.map(async (annot, index) => {
-        let inputAnnot;
-        let field;
-        if (typeof annot.custom === "undefined") return;
+  const doneSigning = async () => {
+    const xfdf = await annotManager.exportAnnotations({
+      widgets: false,
+      links: false,
+    });
+    console.log(xfdf);
 
-        // create a form field based on the type of annotation
-        if (annot.custom.type === "SIGNATURE") {
-          field = new Annotations.Forms.Field(
-            annot.getContents() + Date.now() + index,
-            {
-              type: "Sig",
-            }
-          );
-          inputAnnot = new Annotations.SignatureWidgetAnnotation(field, {
-            appearance: "_DEFAULT",
-            appearances: {
-              _DEFAULT: {
-                Normal: {
-                  data: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuMWMqnEsAAAANSURBVBhXY/j//z8DAAj8Av6IXwbgAAAAAElFTkSuQmCC",
-                  offset: {
-                    x: 100,
-                    y: 100,
-                  },
-                },
-              },
-            },
-          });
-        } else if (annot.custom.type === "DATE") {
-          field = new Annotations.Forms.Field(
-            annot.getContents() + Date.now() + index,
-            {
-              type: "Tx",
-              value: "d-m-yyyy",
-              // Actions need to be added for DatePickerWidgetAnnotation to recognize this field.
-              actions: {
-                F: [
-                  {
-                    name: "JavaScript",
-                    // You can customize the date format here between the two double-quotation marks
-                    // or leave this blank to use the default format
-                    javascript: 'AFDate_FormatEx("dd-mm-yyyy");', // TODO change date format if needed
-                  },
-                ],
-                K: [
-                  {
-                    name: "JavaScript",
-                    // You can customize the date format here between the two double-quotation marks
-                    // or leave this blank to use the default format
-                    javascript: 'AFDate_FormatEx("dd-mm-yyyy");', // TODO change date format if needed
-                  },
-                ],
-              },
-            }
-          );
-
-          inputAnnot = new Annotations.DatePickerWidgetAnnotation(field);
-        } else if (annot.custom.type === "CHECKBOX") {
-          field = new Annotations.Forms.Field(
-            annot.getContents() + Date.now() + index,
-            {
-              type: "Tx",
-              value: annot.custom.value,
-            }
-          );
-          inputAnnot = new Annotations.CheckButtonWidgetAnnotation(field);
-        } else {
-          field = new Annotations.Forms.Field(
-            annot.getContents() + Date.now() + index,
-            {
-              type: "Tx",
-              value: annot.custom.value,
-            }
-          );
-          inputAnnot = new Annotations.TextWidgetAnnotation(field);
-        }
-
-        // set position
-        inputAnnot.PageNumber = annot.getPageNumber();
-        inputAnnot.X = annot.getX();
-        inputAnnot.Y = annot.getY();
-        inputAnnot.rotation = annot.Rotation;
-        if (annot.Rotation === 0 || annot.Rotation === 180) {
-          inputAnnot.Width = annot.getWidth();
-          inputAnnot.Height = annot.getHeight();
-        } else {
-          inputAnnot.Width = annot.getHeight();
-          inputAnnot.Height = annot.getWidth();
-        }
-        inputAnnot.setCustomData("type", annot.custom.type);
-        inputAnnot.setCustomData("autoFill", annot.custom.autoFill);
-
-        // delete original annotation
-        annotsToDelete.push(annot);
-
-        // customize styles of the form field
-        Annotations.WidgetAnnotation.getCustomStyles = function (widget) {
-          if (widget instanceof Annotations.SignatureWidgetAnnotation) {
-            return {
-              border: "1px solid #a5c7ff",
-            };
-          }
-        };
-        Annotations.WidgetAnnotation.getCustomStyles(inputAnnot);
-
-        // draw the annotation the viewer
-        annotManager.addAnnotation(inputAnnot);
-        fieldManager.addField(field);
-        annotsToDraw.push(inputAnnot);
-      })
-    );
-
-    // delete old annotations
-    annotManager.deleteAnnotations(annotsToDelete, null, true);
-
-    // refresh viewer
-    await annotManager.drawAnnotationsFromList(annotsToDraw);
-
+    const signatureTool = docViewer.getTool('AnnotationCreateSignature');
+    var signatures = signatureTool.exportSignatures();
+    signatures = signatures.map(sig => sig.map(p => {
+      console.log(p);
+      return JSON.stringify(p);
+    }));
+    console.log(signatures);
+    signatureTool.importSignatures([JSON.parse(signatures[1])]);
     // TODO tembak BE update document: PUT /api/doc/:docid?fileName=&signType=
+    // TODO tembak BE sign document: POST /api/doc/:docid/sign
   };
-  // END JOJO
 
-  const ConferArea = ({ data }) => (
+  const actionButtons = [
+    { text: "Next", onClick: nextField },
+    { text: "Prev", onClick: prevField },
+    { text: "Done", onClick: doneSigning },
+  ];
+
+  const ConferArea = ({ text, onClick }) => (
     <div className="px-2 py-1">
-      <div
-        draggable
-        onDragStart={(e) => dragStart(e)}
-        onDragEnd={(e) => dragEnd(e, data[0])}
+      <button
+        className="button-placefields"
+        onClick={onClick}
       >
-        <button
-          className="button-placefields"
-          onClick={() => addField(data[0], false)}
-        >
-          {data[0]}
-        </button>
-      </div>
+        {text}
+      </button>
     </div>
   );
 
   return (
-    <div className={"place-field-area"}>
+    <div className={"sign-area"}>
       <div className="row">
-        {/* <div className="col-lg-3 col-md-12 left-sidebar">
+        <div className="col-lg-3 col-md-12 left-sidebar">
           <div className="container">
             <div className="row pt-2">
-              <div className="lead">Signers</div>
-              <select value={assignee} onChange={(val) => setAssignee(val)}>
-                {assigneesValues &&
-                  assigneesValues?.map((assignee, i) => (
-                    <option key={i} value={assignee} data-before={"red"}>
-                      {assignee.label}
-                    </option>
-                  ))}
-              </select>
-
-              <div className="lead">Signature fields</div>
-              {[["SIGNATURE"], ["INITIAL"]]?.map((data, i) => (
-                <ConferArea data={data} key={i} />
-              ))}
-
-              <div className="lead">Auto-fill fields</div>
-              {[["DATE"], ["NAME"], ["EMAIL"], ["COMPANY"], ["TITLE"]]?.map(
-                (data, i) => (
-                  <ConferArea key={i} data={data} />
-                )
-              )}
-
-              <div className="lead">Standard fields</div>
-              {[["TEXT"], ["CHECKBOX"]]?.map((data, i) => (
-                <ConferArea key={i} data={data} />
+              <div className="lead">Sign Document</div>
+              {actionButtons?.map(({ text, onClick }, i) => (
+                <ConferArea text={text} onClick={onClick} key={i} />
               ))}
             </div>
           </div>
-        </div> */}
+        </div>
 
-        <div className="col-12">
+        <div className="col-lg-9 col-md-12">
           <div className="webviewer" ref={viewer}></div>
         </div>
       </div>

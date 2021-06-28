@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from "react";
 // import { navigate } from "@reach/router";
 // import { selectDocToView } from "./ViewDocumentSlice";
 // import { storage } from '../../firebase/firebase';
-import WebViewer, { Annotations } from "@pdftron/webviewer";
+import WebViewer from "@pdftron/webviewer";
 import { useData } from "../../../contexts/DataContext";
 import { useAuth } from "../../../contexts/AuthContext";
 import "./placefield.css";
@@ -24,7 +24,7 @@ const PlaceField = ({
   // JOJO
   const [dropPoint, setDropPoint] = useState(null);
 
-  const { handle_data_docs, getItemData } = useData();
+  const { getItemData } = useData();
   const fileData = getItemData(atr, "fileData");
   var assignees = getItemData(atr, "signers");
 
@@ -54,6 +54,7 @@ const PlaceField = ({
         },
         viewer.current
       ).then(async (instance) => {
+        // load document
         instance.loadDocument(fileData?.linkToPdf ?? temp, {
           filename: fileData?.filename,
         });
@@ -174,8 +175,8 @@ const PlaceField = ({
     annotManager.selectAnnotation(textAnnot);
   };
 
-  const applyFields = async () => {
-    // TODO pindahin ke ReviewSend.js
+  const applyFieldsAndSend = async () => {
+    // TODO pindahin ke ReviewSend.js, gimana connectin variable instance di bawah ini ke file itu? perlu retrieve data fieldnya
     const { Annotations, docViewer } = instance;
     const annotManager = docViewer.getAnnotationManager();
     const fieldManager = annotManager.getFieldManager();
@@ -314,7 +315,7 @@ const PlaceField = ({
       >
         <button
           className="button-placefields"
-          onClick={() => addField(data[0], false)}
+          onClick={() => addField(data[0], false)} // TODO: true if AutoFill Fields
         >
           {data[0]}
         </button>

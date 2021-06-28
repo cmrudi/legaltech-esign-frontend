@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { useInput } from "../../../helpers/hooks";
+// import { useInput } from "../../../helpers/hooks";
 
 const OpenCam = (props) => {
   const player = useRef(null);
