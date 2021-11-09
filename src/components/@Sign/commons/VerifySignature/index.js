@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 
 import "./index.scss";
 // import { useModal } from "contexts/ModalContext";
-import { useInput, useOTP } from "helpers/hooks";
-import OTPInput from "components/commons/OTPInput";
+import { useInput } from "helpers/hooks";
+import OtpInput from "react-otp-input";
+
 import { useAuth } from "contexts/AuthContext";
 import { useSnackbar } from "contexts/SnackbarContext";
 import { sendOTPDoc, verifyOTPDoc } from "api/docs";
@@ -27,7 +28,8 @@ const VerifySignature = (props) => {
   const { auth } = useAuth();
   const [phone, setPhone] = useState("");
   const isSentPhone = useInput(false);
-  const otp = useOTP(6);
+  // const otp = useOTP(6);
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const { addSnackbar } = useSnackbar();
   const [token, setToken] = useState("");
@@ -56,7 +58,7 @@ const VerifySignature = (props) => {
   const verifyOTPDocWrapper = async () => {
     try {
       setLoading(true);
-      const res = await verifyOTPDoc(fileUID, otp?.number, token, isSign);
+      const res = await verifyOTPDoc(fileUID, otp, token, isSign);
       if (res) {
         onClickCTA();
         addSnackbar(t("popup.sign.verify.success2"), "success");
@@ -95,6 +97,10 @@ const VerifySignature = (props) => {
   //   }
   // };
 
+  useEffect(() => {
+    console.log(otp);
+  }, [otp]);
+
   return (
     <div className="verify-signature-container">
       <h5 className="head">{t("popup.sign.verify.head")}</h5>
@@ -117,7 +123,25 @@ const VerifySignature = (props) => {
       <div className="sec-mid">
         <div className="text">{t("popup.sign.verify.bacod")}</div>
         <div className="otp">
-          <OTPInput otp={otp} autoFocus={!false} />
+          <OtpInput
+            value={otp}
+            containerStyle={{ width: "100%", justifyContent: "space-between" }}
+            onChange={(value) => setOtp(value)}
+            numInputs={6}
+            inputStyle={{
+              // border: "0",
+              fontSize: "1.5rem",
+              width: "3rem",
+              outline: "none",
+              background: "initial",
+              border: "1px solid black",
+              borderRadius: "2px",
+              padding: "0.5rem .5rem",
+              margin: "0.5rem",
+            }}
+            separator={<></>}
+          />
+          {/* <OTPInput otp={otp} autoFocus={!false} /> */}
         </div>
         <div className="resend-button-area">
           <button
@@ -132,11 +156,9 @@ const VerifySignature = (props) => {
       <div className="button-below">
         <button
           className="btn btn-primary squared"
-          disabled={loading || String(otp?.number).length < 6}
+          disabled={loading || String(otp).length < 6}
           onClick={
-            isAuth
-              ? () => verifyOTPAuthWrapper(otp?.number)
-              : verifyOTPDocWrapper
+            isAuth ? () => verifyOTPAuthWrapper(otp) : verifyOTPDocWrapper
           }
         >
           {t("general.submit")}

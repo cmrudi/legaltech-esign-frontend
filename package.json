@@ -37,6 +37,7 @@
     "react-draggable": "^4.4.3",
     "react-google-login": "^5.2.2",
     "react-i18next": "^11.10.0",
+    "react-otp-input": "^2.4.0",
     "react-redux": "^7.2.0",
     "react-responsive-modal": "^5.2.6",
     "react-rnd": "^10.3.4",

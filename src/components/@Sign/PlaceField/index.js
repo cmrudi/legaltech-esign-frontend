@@ -369,7 +369,7 @@ const PlaceField = ({ activeItemId, atr }) => {
 
   const undoField = useCallback(() => {
     if (stateStack.length > 1 && stackIdx > 0) {
-      console.log("undo");
+      // console.log("undo");
       setFields(JSON.parse(JSON.stringify(stateStack[stackIdx - 1])));
       setStackIdx((i) => i - 1);
       scrollToPage();
@@ -377,11 +377,11 @@ const PlaceField = ({ activeItemId, atr }) => {
   }, [stateStack, stackIdx, setFields, setStackIdx, scrollToPage]);
 
   const redoField = useCallback(() => {
-    console.log("redo");
+    // console.log("redo");
     if (stackIdx + 1 < stateStack.length) {
       setFields(JSON.parse(JSON.stringify(stateStack[stackIdx + 1])));
       setStackIdx((i) => i + 1);
-      console.log("redoed");
+      // console.log("redoed");
       scrollToPage();
     }
   }, [stateStack, stackIdx, setFields, setStackIdx, scrollToPage]);

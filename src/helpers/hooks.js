@@ -79,12 +79,6 @@ export const usePrevious = (value) => {
   return ref.current;
 };
 
-export const useOTP = (length) => {
-  const [value, setValue] = useState(Array(length).fill(""));
-  const number = value.join("");
-  return { value, set: setValue, number };
-};
-
 export const useWidth = () => {
   const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {

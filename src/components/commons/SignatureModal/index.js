@@ -57,7 +57,7 @@ const SignatureModal = ({ isInitial, extraCallback = () => {} }) => {
       try {
         setLoading(1);
         const res = await addSignature(fileData, isInitial);
-        console.log("RES", res?.data);
+        // console.log("RES", res?.data);
         if (res?.data) {
           progress.set(100);
           putAuth(res.data);
