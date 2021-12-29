@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useData } from "../../contexts/DataContext";
 import { useFormInput, useRefreshedData } from "../../helpers/hooks";
@@ -25,21 +25,25 @@ const Docs = () => {
     docs ?? []
   );
   const { openSendWhatsapp } = useModal();
+  const [loading, setLoading] = useState(false);
 
   const activeDoc = useRefreshedData(false);
 
   const fetchingDocs = useCallback(async () => {
-    if (!docs) {
+    if (!loading) {
       try {
         const res = await getAllDocs();
         if (res) {
+          console.log(res);
           setDocs(res);
         }
       } catch (err) {
         addSnackbar(String(err));
+      } finally {
+        setLoading(true);
       }
     }
-  }, [setDocs, docs, addSnackbar]);
+  }, [setDocs, addSnackbar, loading]);
 
   useEffect(() => {
     fetchingDocs();
