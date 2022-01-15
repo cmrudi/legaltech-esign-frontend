@@ -24,7 +24,7 @@ const VerifySignature = (props) => {
     isSign = false,
   } = props;
   const { t } = useTranslation();
-  const { openFasterThanPrinting } = useModal();
+  const { openFasterThanPrinting, onClose } = useModal();
   const { auth } = useAuth();
   const [phone, setPhone] = useState("");
   const isSentPhone = useInput(false);
@@ -65,7 +65,9 @@ const VerifySignature = (props) => {
         isSentPhone?.set(true);
         const currentHost = window.location.host;
         const signUrl = `https://${currentHost}${FRONTEND_URL.document}/${fileUID}`;
-
+        if (isSign) {
+          onClose();
+        }
         if (!isSign) {
           openFasterThanPrinting({ finalUrl: signUrl });
           resetDataDocs();
