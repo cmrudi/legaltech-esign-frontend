@@ -6,7 +6,7 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { useSnackbar } from "./SnackbarContext";
+// import { useSnackbar } from "./SnackbarContext";
 
 export const DataContext = createContext({});
 export const useData = () => useContext(DataContext);
@@ -44,7 +44,7 @@ export let INITDATA = {
 };
 
 const DataProvider = ({ children }) => {
-  const { addSnackbar } = useSnackbar();
+  // const { addSnackbar } = useSnackbar();
 
   const [dataDocs, dispatchDataDocs] = useReducer(reducer, {
     me: INITDATA,
@@ -65,8 +65,8 @@ const DataProvider = ({ children }) => {
           return { ...now, [documentId]: res.auditTrails };
         });
       }
-    } catch (e) {
-      addSnackbar(String(e));
+    } catch (_) {
+      // addSnackbar(String(e));
     }
   };
 
