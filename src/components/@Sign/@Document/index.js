@@ -149,6 +149,7 @@ const Document = () => {
 
   const isAllFieldDone = useMemo(() => {
     for (let field of fields) {
+      if (!field?.required) continue;
       const special =
         ["signature", "initial"].includes(String(field?.type).toLowerCase()) &&
         currentSigner?.email === field?.signer?.email;
@@ -219,7 +220,7 @@ const Document = () => {
       if (field?.isEditing) {
         continue;
       }
-      if (!field?.idEditing) {
+      if (!field?.idEditing && field?.required) {
         const currentField = document.getElementById(
           `sign-field-${field.uuid}`
         );
