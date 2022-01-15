@@ -188,6 +188,7 @@ const SignFieldBox = ({
                   fontSize: field?.formatting?.size,
                   fontFamily: field?.formatting?.font,
                   border: 0,
+                  background: "transparent",
                 }}
                 onChange={(e) => {
                   let temp = fields;

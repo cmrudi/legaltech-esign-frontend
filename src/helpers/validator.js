@@ -80,7 +80,10 @@ export const isHeaderHighlighted = (pathname) => {
 
 export const isPublicLink = (pathname) => {
   if (!pathname) return false;
-  return publicLinks.includes(pathname);
+  for (let publicLink of publicLinks) {
+    if (String(pathname).includes(publicLink)) return true;
+  }
+  return false;
 };
 
 export class PersonalDetailValidator {

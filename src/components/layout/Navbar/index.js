@@ -26,8 +26,7 @@ const Navbar = () => {
     location?.pathname === FRONTEND_URL.login ||
     location?.pathname === `${FRONTEND_URL.login}/` ||
     isHeaderHighlighted(location?.pathname) ||
-    isPublicLink(location?.pathname) ||
-    String(location?.pathname).includes("document/audittrail")
+    isPublicLink(location?.pathname)
   )
     return <></>;
 

@@ -23,8 +23,7 @@ const Router = () => {
       location?.pathname === FRONTEND_URL.me ||
       location?.pathname === FRONTEND_URL.all ||
       location?.pathname === FRONTEND_URL.request ||
-      location?.pathname === FRONTEND_URL.document ||
-      String(location?.pathname).includes("document/audittrail")
+      String(location?.pathname).includes(FRONTEND_URL.document)
     );
   }, [location]);
 

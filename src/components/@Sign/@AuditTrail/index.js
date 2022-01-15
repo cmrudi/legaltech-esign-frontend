@@ -47,7 +47,7 @@ const SummaryArea = ({ data, t }) => {
         </div>
         {data?.nameRecipients &&
           data?.nameRecipients?.map((user, i) => (
-            <div>
+            <div key={i}>
               {t("sign.documentAuditTrail.recipient")} {i + 1}: {user}
             </div>
           ))}
@@ -218,9 +218,9 @@ const RealAuditTrail = ({ t, data }) => {
                     <small>{datum?.userAgent}</small>
                   </div>
                   <div>
-                    {getReadableTimestamp(datum?.updatedAt).split(" ")[0]}
+                    {getReadableTimestamp(datum?.timestamp).split(" ")[0]}
                     <br />
-                    {getReadableTimestamp(datum?.updatedAt).split(" ")[1]}
+                    {getReadableTimestamp(datum?.timestamp).split(" ")[1]}
                   </div>
                 </TimelineContent>
               </TimelineItem>
