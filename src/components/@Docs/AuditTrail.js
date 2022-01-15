@@ -11,7 +11,6 @@ const AuditTrail = ({ activeDoc, auditTrails }) => {
   );
 
   const auditTrailLink = useMemo(() => {
-    if (activeDoc?.value?.status !== DRAFT_STATUS.COMPLETED) return "";
     const currentHost = window.location.host;
     const auditTrailUrl = `http://${currentHost}${FRONTEND_URL.documentAuditTrail}/${activeDoc?.value?.uid}`;
     return auditTrailUrl;
@@ -25,15 +24,27 @@ const AuditTrail = ({ activeDoc, auditTrails }) => {
       </div>
       <div className="wrap-audit">
         <div className="pt-1 pb-2" style={{ fontSize: "0.8rem" }}>
-          <a
-            href={auditTrailLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary"
-            style={{ fontWeight: "bolder", textDecoration: "unset" }}
-          >
-            {activeDoc?.value?.filename}
-          </a>
+          {activeDoc?.value?.status !== DRAFT_STATUS.COMPLETED ? (
+            <span
+              style={{
+                fontWeight: "bolder",
+                textDecoration: "unset",
+                fontSize: "0.8rem",
+              }}
+            >
+              {activeDoc?.value?.filename}
+            </span>
+          ) : (
+            <a
+              href={auditTrailLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+              style={{ fontWeight: "bolder", textDecoration: "unset" }}
+            >
+              {activeDoc?.value?.filename}
+            </a>
+          )}
         </div>
         <CustomizedTimeline data={auditData} />
         {/* <button className="btn btn-primary btn-sm">
