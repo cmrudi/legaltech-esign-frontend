@@ -244,9 +244,10 @@ $tools-height: 10vh;
               width: 100%;
               input {
                 height: 100%;
-                width: 100%;
-                text-align: center;
+                // width: 100%;
+                // text-align: center;
                 background: transparent;
+                outline: none;
               }
             }
           }
