@@ -89,9 +89,11 @@ const SignatureModal = ({ isInitial, extraCallback = () => {} }) => {
         const doc = document.getElementById("showed-font-input-tag");
         doc.style.background = "transparent";
         doc.style.border = 0;
+        doc.style.width = "unset";
         const res = await convertToImg(doc);
         doc.style.background = "var(--secondary-extra-color-4)";
         doc.style.border = "2px inset rgba(118, 118, 118, 0.3)";
+        doc.style.width = null;
         await addingSignature(res);
       }
     } catch (err) {
