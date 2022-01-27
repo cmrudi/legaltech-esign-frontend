@@ -62,6 +62,11 @@ const SignFieldBox = ({
   });
 
   const fieldElement = useMemo(() => getReadableFieldIcon(field), [field]);
+  const minHeight = useMemo(() => {
+    const size = field?.formatting?.size;
+    if (!size) return `calc(1rem + 2px)`;
+    return `${field?.formatting?.size + 6}px`;
+  }, [field]);
 
   return (
     <Rnd
@@ -92,7 +97,8 @@ const SignFieldBox = ({
       onDragStop={() => {
         return;
       }}
-      style={{ border: 0, zIndex: 888 }}
+      minHeight={minHeight}
+      style={{ border: 0, zIndex: 888, minHeight: "1rem" }}
       className="draggable-item"
     >
       <span
@@ -166,6 +172,7 @@ const SignFieldBox = ({
             ? "transparent"
             : field?.signer?.backgroundColor,
           color: "white",
+          minHeight,
         }}
       >
         {!field?.isEditing && (
@@ -177,7 +184,7 @@ const SignFieldBox = ({
           !["initial", "signature"].includes(
             String(field?.type).toLowerCase()
           ) && (
-            <div className="full-field-box">
+            <div className="full-field-box" style={{ minHeight }}>
               <input
                 value={field?.value}
                 disabled={
@@ -189,6 +196,7 @@ const SignFieldBox = ({
                   fontFamily: field?.formatting?.font,
                   border: 0,
                   background: "transparent",
+                  minHeight: field?.formatting?.size ?? "1rem",
                 }}
                 onChange={(e) => {
                   let temp = fields;

@@ -108,35 +108,19 @@ const FieldBox = ({
     [auth]
   );
 
-  // useEffect(() => {
-  //   let temp = fields;
-  //   let ax = temp.map((oneField) => {
-  //     return {
-  //       ...oneField,
-  //       value: !isTheSelectedFieldSameAsThisField(oneField)
-  //         ? oneField?.value
-  //         : String(field?.type).toLowerCase() === "initial"
-  //         ? initial_image_url
-  //         : signature_image_url,
-  //     };
-  //   });
-  //   setFields(ax);
-  //   setCurrentField((field) => {
-  //     return {
-  //       ...field,
-  //       value: !isTheSelectedFieldSameAsThisField(field)
-  //         ? field?.value
-  //         : String(field?.type).toLowerCase() === "initial"
-  //         ? initial_image_url
-  //         : signature_image_url,
-  //     };
-  //   });
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [
-  //   initial_image_url,
-  //   signature_image_url,
-  //   isTheSelectedFieldSameAsThisField,
-  // ]);
+  // const getMinimumWidth = useMemo(() => {
+  //   if (["signature", "initial"].includes(String(field?.type).toLowerCase()))
+  //     return "";
+  //   if (!field?.value) return "";
+  //   const length = String(field?.value).length;
+  //   return `${length}rem`;
+  // }, [field]);
+
+  const minHeight = useMemo(() => {
+    const size = field?.formatting?.size;
+    if (!size) return `calc(1rem + 2px)`;
+    return `${field?.formatting?.size + 6}px`;
+  }, [field]);
 
   const handle = (
     <FieldHandle color={field?.signer?.color} stroke={field?.signer?.color} />
@@ -213,7 +197,12 @@ const FieldBox = ({
         pushToStack(temp);
         // setIsEditing(isEditing);
       }}
-      style={{ border: "1px solid", zIndex: 888 }}
+      style={{
+        border: "1px solid",
+        zIndex: 888,
+      }}
+      // minWidth={getMinimumWidth}
+      minHeight={minHeight}
       className="draggable-item"
     >
       <span
@@ -289,6 +278,8 @@ const FieldBox = ({
             ? "transparent"
             : field?.signer?.backgroundColor,
           color: "white",
+          minHeight,
+          // ...getMinimumWidth,
         }}
       >
         {!isEditing && (
@@ -300,7 +291,7 @@ const FieldBox = ({
           !["initial", "signature"].includes(
             String(field?.type).toLowerCase()
           ) && (
-            <div className="full-field-box">
+            <div className="full-field-box" style={{ minHeight }}>
               <input
                 value={field?.value}
                 disabled={["email", "date"].includes(
@@ -314,6 +305,8 @@ const FieldBox = ({
                   fontSize: field?.formatting?.size,
                   fontFamily: field?.formatting?.font,
                   border: 0,
+                  minHeight: minHeight,
+                  // ...getMinimumWidth,
                 }}
                 onChange={(e) => {
                   let temp = fields;
@@ -412,3 +405,33 @@ export const QRCodeBox = ({ qrCodeImg, qrPosition, pageNum, scale }) => {
 };
 
 export default FieldBox;
+
+// useEffect(() => {
+//   let temp = fields;
+//   let ax = temp.map((oneField) => {
+//     return {
+//       ...oneField,
+//       value: !isTheSelectedFieldSameAsThisField(oneField)
+//         ? oneField?.value
+//         : String(field?.type).toLowerCase() === "initial"
+//         ? initial_image_url
+//         : signature_image_url,
+//     };
+//   });
+//   setFields(ax);
+//   setCurrentField((field) => {
+//     return {
+//       ...field,
+//       value: !isTheSelectedFieldSameAsThisField(field)
+//         ? field?.value
+//         : String(field?.type).toLowerCase() === "initial"
+//         ? initial_image_url
+//         : signature_image_url,
+//     };
+//   });
+//   // eslint-disable-next-line react-hooks/exhaustive-deps
+// }, [
+//   initial_image_url,
+//   signature_image_url,
+//   isTheSelectedFieldSameAsThisField,
+// ]);
