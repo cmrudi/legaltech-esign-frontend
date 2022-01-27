@@ -198,8 +198,8 @@ const FieldBox = ({
           if (!isTheseFieldsSame(t, field)) return t;
           return {
             ...t,
-            x: component.x / field?.pagePosition?.width,
-            y: component.y / field?.pagePosition?.height,
+            x: (component.x - 2) / field?.pagePosition?.width,
+            y: (component.y - 2) / field?.pagePosition?.height,
           };
         });
         setFields(temp);
